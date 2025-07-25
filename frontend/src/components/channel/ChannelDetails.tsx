@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ChannelDetails({ taskId }: { taskId: string }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [videos, setVideos] = useState<any[]>([]);
   const [status, setStatus] = useState<string>("PENDING");
   const router = useRouter();
@@ -47,9 +47,8 @@ export default function ChannelDetails({ taskId }: { taskId: string }) {
 
   return (
     <div>
-      <h2>✅ Videos fetched:</h2>
-      {videos?.length === 0 ? (
-        <p>No videos found.</p>
+      {loading ? (
+        <p>Loading videos for this person.</p>
       ) : (
         <ul>
           {videos?.map((video, idx) => (

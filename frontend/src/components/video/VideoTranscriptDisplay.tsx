@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function VideoTranscriptDisplay({ taskId }: { taskId: string }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [transcript, setTranscript] = useState("");
   const [status, setStatus] = useState<string>("PENDING");
 
@@ -21,9 +21,9 @@ export default function VideoTranscriptDisplay({ taskId }: { taskId: string }) {
         setStatus(taskStatus);
 
         if (taskStatus === "SUCCESS") {
-          setTranscript(res.data.full_text);
+          setTranscript(res.data.result);
           console.log(res.data);
-          clearInterval(interval); // stop polling
+          clearInterval(interval);
           setLoading(false);
         } else if (taskStatus === "FAILURE") {
           clearInterval(interval);
@@ -46,8 +46,14 @@ export default function VideoTranscriptDisplay({ taskId }: { taskId: string }) {
 
   return (
     <div>
-      <p>📜 Transcript:</p>
-      <p>{transcript}</p>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div>
+          <p>📜 Transcript:</p>
+          <p>{transcript}</p>
+        </div>
+      )}
     </div>
   );
 }
