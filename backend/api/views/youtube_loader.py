@@ -1,4 +1,3 @@
-import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from celery.result import AsyncResult
@@ -62,22 +61,4 @@ def get_task_status(request, task_id):
         response["result"] = result.result
 
     return Response(response)
-
-@api_view(["GET"])
-def get_video_details(request, video_id):
-    url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id={video_id}&key={YOUTUBE_API_KEY}"
-    res = requests.get(url).json()
-    items = res.get("items", [])
-    if not items:
-        raise ValueError("Invalid video ID or video not found.")
-
-    data = items[0]
-    return Response({
-        "title": data["snippet"]["title"],
-        "description": data["snippet"]["description"],
-        "views": data["statistics"].get("viewCount"),
-        "likes": data["statistics"].get("likeCount"),
-        "duration": data["contentDetails"].get("duration"),
-        "published": data["snippet"]["publishedAt"],
-    })
 

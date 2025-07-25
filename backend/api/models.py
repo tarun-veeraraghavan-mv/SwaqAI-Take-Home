@@ -22,3 +22,7 @@ class Channel(models.Model):
     subscriber_count = models.IntegerField()
     video_count = models.IntegerField()
     view_count = models.IntegerField()
+
+class Episode(models.Model):
+    transcript = models.TextField()
+    questions = models.JSONField(null=True, blank=True)

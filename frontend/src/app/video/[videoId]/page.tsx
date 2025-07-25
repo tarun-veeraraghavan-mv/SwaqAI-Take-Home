@@ -1,6 +1,9 @@
 import VideoTranscriptDisplay from "@/components/video/VideoTranscriptDisplay";
-import axios from "axios";
-import React from "react";
+import {
+  getLLMResponseByVideoId,
+  getTranscriptByVideoId,
+  getVideoDetails,
+} from "@/services/videos";
 
 interface PageProps {
   params: {
@@ -11,17 +14,20 @@ interface PageProps {
 export default async function page({ params }: PageProps) {
   const { videoId } = await params;
 
-  const res = await axios.post(
-    "http://localhost:8000/api/fetch-video-transcript-by-id/",
-    { video_id: videoId }
-  );
-
-  console.log(res);
+  const [data2, transcript] = await Promise.all([
+    getVideoDetails(videoId),
+    getTranscriptByVideoId(videoId),
+  ]);
+  const video = data2.video;
 
   return (
     <div>
-      <div className="grid grid-cols-3">
-        <VideoTranscriptDisplay taskId={res.data.task_id} />
+      <div>
+        <VideoTranscriptDisplay
+          // taskId={data1.task_id}
+          video={video}
+          transcript={transcript}
+        />
       </div>
     </div>
   );

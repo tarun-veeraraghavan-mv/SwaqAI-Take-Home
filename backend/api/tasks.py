@@ -1,50 +1,12 @@
 import requests
 from celery import shared_task
 import os
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
+from .models import Episode
+from django.core.cache import cache
+from .llm_workflows.test import llm_chain
 from dotenv import load_dotenv
 load_dotenv()
 
-openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-
-llm = ChatOpenAI(
-    openai_api_key=openrouter_api_key,
-    model="deepseek/deepseek-r1-0528-qwen3-8b:free",
-    openai_api_base="https://openrouter.ai/api/v1",
-)
-
-prompt = ChatPromptTemplate.from_messages([
-  ("system", """
-You are an expert analyst who given a transcript follows the instructions gievn below
-
-1. Extract the key questions being discussed in the transcript.
-2. For each question:
-    - Is the answer given in the transcript correct or misleading?
-    - Provide a short commentary:
-        - ✅ If correct, explain briefly.
-        - ❌ If wrong, say why (factually wrong / biased / oversimplified / outdated / misleading).
-3. Find the exact span of the transcript text where the answer is discussed.
-    - Return the **start and end character index** of the entire evidence you used to justify the commentary (not timestamps).
-    - Make sure they are perfect **based on the original transcript string** you received. 
-    - Dont add any text or descriptions
-        
-Respond in JSON format like:
-[
-  {{
-    "question": "...",
-    "answer_agreement": true/false,
-    "commentary": "...",
-    "start_index": 453,
-    "end_index": 892
-  }},
-  ...
-]
-"""),
-("human", "{transcript}")
-])
-
-llm_chain = prompt | llm
 def generate_response(transcript: str):
     response = llm_chain.invoke({"transcript": transcript})
 
@@ -54,6 +16,12 @@ YOUTUBE_API_KEY = "AIzaSyBiKuzKL7z9Be9ukgiGo0L_A5IGJf9RWr4"
 
 @shared_task
 def fetch_channel_videos_task(channel_url):
+    cache_key = f"videos_for_channel:{channel_url}"
+    cache_data = cache.get(key=cache_key)
+
+    if cache_data:
+        return cache_data
+
     try:
         # STEP 1: Get channel ID
         search_url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q={channel_url}&key={YOUTUBE_API_KEY}"
@@ -97,11 +65,15 @@ def fetch_channel_videos_task(channel_url):
             for item in videos_res.get("items", [])
         ]
 
-        return {
+        result = {
             "status": "SUCCESS",
             "channel_id": channel_id,
             "videos": videos
         }
+
+        cache.set(cache_key, result, timeout=1200)
+
+        return result
 
     except Exception as e:
         return {
@@ -134,8 +106,25 @@ def fetch_transcript_task(video_id):
 
     full_text = " ".join(chunk.get("text", "") for chunk in transcript)
 
-    return full_text
+    episode = Episode.objects.create(transcript=full_text)
+
+    response_generation_task = generate_response_task.delay(transcript=full_text, episode_id=episode.id)
+
+    return {
+            "status": "SUCCESS",
+            "episode_id": episode.id,
+            "response_generation_task_id": response_generation_task.task_id
+        }
 
 @shared_task
-def generate_response_task(transcript: str):
-    return generate_response(transcript=transcript)
+def generate_response_task(transcript: str, episode_id: int):
+    try:
+        response = generate_response(transcript=transcript)
+
+        episode = Episode.objects.get(id=episode_id)
+        episode.questions = response
+        episode.save()
+
+        return {"status": "SUCCESS", "episode_id": episode.id}
+    except Exception as e:
+        return {"status": "FAILURE", "error": str(e)}

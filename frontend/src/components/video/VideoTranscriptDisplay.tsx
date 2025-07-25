@@ -3,57 +3,85 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-export default function VideoTranscriptDisplay({ taskId }: { taskId: string }) {
+export default function VideoTranscriptDisplay({
+  video,
+  transcript,
+  response,
+}: {
+  video: any;
+  transcript: string;
+}) {
   const [loading, setLoading] = useState(true);
-  const [transcript, setTranscript] = useState("");
-  const [status, setStatus] = useState<string>("PENDING");
+  // const [transcript, setTranscript] = useState("");
+  const [llmResponse, setLlmResponse] = useState("");
+  const [episodeId, setEpisodeId] = useState<number | null>(null);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
+  // useEffect(() => {
+  //   const pollTranscriptTask = setInterval(async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         `http://localhost:8000/api/get-task-status/${taskId}/`
+  //       );
 
-    const fetchTaskStatus = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8000/api/get-task-status/${taskId}/`
-        );
+  //       if (res.data.status === "SUCCESS") {
+  //         const epId = res.data.result.episode_id;
+  //         setEpisodeId(epId);
 
-        const taskStatus = res.data.status;
-        setStatus(taskStatus);
+  //         const resTranscript = await axios.get(
+  //           `http://localhost:8000/api/get-episode/${epId}/`
+  //         );
+  //         setTranscript(resTranscript.data.full_text);
 
-        if (taskStatus === "SUCCESS") {
-          setTranscript(res.data.result);
-          console.log(res.data);
-          clearInterval(interval);
-          setLoading(false);
-        } else if (taskStatus === "FAILURE") {
-          clearInterval(interval);
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error("Polling error:", err);
-        clearInterval(interval); // kill polling on error
-        setLoading(false);
-      }
-    };
+  //         clearInterval(pollTranscriptTask);
+  //       }
+  //     } catch (err) {
+  //       console.error("❌ Transcript task polling failed:", err);
+  //       clearInterval(pollTranscriptTask);
+  //     }
+  //   }, 2000);
 
-    interval = setInterval(fetchTaskStatus, 2500);
-    fetchTaskStatus(); // hit immediately
+  //   return () => clearInterval(pollTranscriptTask);
+  // }, [taskId]);
 
-    return () => clearInterval(interval);
-  }, [taskId]);
+  // useEffect(() => {
+  //   if (!episodeId) return;
 
-  if (loading && status !== "SUCCESS") return <p>⏳ Processing… {status}</p>;
+  //   const pollLLMResponse = setInterval(async () => {
+  //     try {
+  //       const resLLM = await axios.get(
+  //         `http://localhost:8000/api/get-llm-response-of-video/${episodeId}/`
+  //       );
+
+  //       if (resLLM.data.llm_response !== null) {
+  //         setLlmResponse(JSON.stringify(resLLM.data.llm_response, null, 2));
+  //         setLoading(false);
+  //         clearInterval(pollLLMResponse);
+  //       }
+  //     } catch (err) {
+  //       console.error("❌ LLM polling failed:", err);
+  //       clearInterval(pollLLMResponse);
+  //     }
+  //   }, 2500);
+
+  //   return () => clearInterval(pollLLMResponse);
+  // }, [episodeId]);
 
   return (
-    <div>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div>
-          <p>📜 Transcript:</p>
-          <p>{transcript}</p>
-        </div>
-      )}
+    <div className="grid grid-cols-3 gap-5">
+      <div>
+        <h2 className="font-bold text-xl mb-3">Description of video</h2>
+        <p>{video.title}</p>
+        <p>{video.description}</p>
+        <p>{video.views}</p>
+        <p>{video.likes}</p>
+      </div>
+      <div>
+        <h2 className="font-bold text-xl mb-3">Transcript of video</h2>
+        <p>{transcript}</p>
+      </div>
+      <div>
+        <h2 className="font-bold text-xl mb-3">Response of video</h2>
+      </div>
     </div>
   );
 }
