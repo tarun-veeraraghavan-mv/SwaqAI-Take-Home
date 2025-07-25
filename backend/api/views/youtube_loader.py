@@ -8,9 +8,15 @@ from langchain_core.prompts import ChatPromptTemplate
 from celery.result import AsyncResult
 from celery import chain
 from ..tasks import notify_customers, fetch_channel_videos_task
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+openrouter_api_key = os.getenv("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")
 
 llm = ChatOpenAI(
-    openai_api_key="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",
+    openai_api_key=openrouter_api_key,
     model="deepseek/deepseek-r1-0528-qwen3-8b:free",
     openai_api_base="https://openrouter.ai/api/v1",
 )

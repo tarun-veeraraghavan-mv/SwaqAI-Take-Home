@@ -17,6 +17,7 @@ langchain = "*"
 langchain-community = "*"
 celery = "*"
 redis = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
