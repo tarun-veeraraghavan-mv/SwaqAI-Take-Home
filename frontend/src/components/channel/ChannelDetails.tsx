@@ -50,13 +50,19 @@ export default function ChannelDetails({ taskId }: { taskId: string }) {
       {loading ? (
         <p>Loading videos for this person.</p>
       ) : (
-        <ul>
+        <ul className="grid grid-cols-3 gap-5">
           {videos?.map((video, idx) => (
             <li key={idx}>
+              <img src={video.thumbnail} alt="Thumbnail" />
               <p>{video.title}</p>
-              <button onClick={() => router.push(`/video/${video.video_id}`)}>
-                See video details
-              </button>
+              <div className="flex justify-between">
+                <button onClick={() => router.push(`/video/${video.video_id}`)}>
+                  Analyze video
+                </button>
+                <a href={video.video_url} target="_blank">
+                  View video
+                </a>
+              </div>
             </li>
           ))}
         </ul>

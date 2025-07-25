@@ -21,6 +21,7 @@ python-dotenv = "*"
 csvkit = "*"
 psycopg2 = "*"
 psycopg = "*"
+django-redis = "*"
 
 [dev-packages]
 

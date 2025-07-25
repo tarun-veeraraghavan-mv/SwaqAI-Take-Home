@@ -67,26 +67,34 @@ def fetch_channel_videos_task(channel_url):
         # STEP 2: Get uploads playlist ID
         channel_details_url = f"https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id={channel_id}&key={YOUTUBE_API_KEY}"
         details_res = requests.get(channel_details_url).json()
-        details_items = details_res.get("items", [])
-        if not details_items:
-            raise ValueError("No content details found for the channel.")
+        uploads_playlist_id = details_res["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
-        uploads_playlist_id = details_items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
-
-        # STEP 3: Fetch videos from playlist
-        videos_url = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={uploads_playlist_id}&maxResults=25&key={YOUTUBE_API_KEY}"
-        videos_res = requests.get(videos_url).json()
-        videos_items = videos_res.get("items", [])
-        if not videos_items:
+        # STEP 3: Get video IDs from uploads playlist
+        playlist_items_url = f"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId={uploads_playlist_id}&maxResults=25&key={YOUTUBE_API_KEY}"
+        playlist_res = requests.get(playlist_items_url).json()
+        playlist_items = playlist_res.get("items", [])
+        if not playlist_items:
             raise ValueError("No videos found in the uploads playlist.")
+
+        video_ids = [item["snippet"]["resourceId"]["videoId"] for item in playlist_items]
+        ids_param = ",".join(video_ids)
+
+        # STEP 4: Get full video details
+        videos_url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,contentDetails&id={ids_param}&key={YOUTUBE_API_KEY}"
+        videos_res = requests.get(videos_url).json()
 
         videos = [
             {
                 "title": item["snippet"]["title"],
-                "video_id": item["snippet"]["resourceId"]["videoId"],
-                "video_url": f"https://www.youtube.com/watch?v={item['snippet']['resourceId']['videoId']}"
+                "video_id": item["id"],
+                "video_url": f"https://www.youtube.com/watch?v={item['id']}",
+                "thumbnail": item["snippet"]["thumbnails"]["high"]["url"],
+                "views": item["statistics"].get("viewCount", "0"),
+                "likes": item["statistics"].get("likeCount", "0"),
+                "duration": item["contentDetails"]["duration"],
+                "published_at": item["snippet"]["publishedAt"]
             }
-            for item in videos_items
+            for item in videos_res.get("items", [])
         ]
 
         return {
@@ -100,6 +108,7 @@ def fetch_channel_videos_task(channel_url):
             "status": "FAILURE",
             "error": str(e)
         }
+
             
 @shared_task
 def fetch_transcript_task(video_id):

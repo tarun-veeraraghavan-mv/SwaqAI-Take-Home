@@ -1,24 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ChannelCardProps } from "@/types/channels";
+import {
+  deleteChannelForUser,
+  fetchVideosForChannel,
+} from "@/services/channels";
 
 export default function ChannelCard({
   channel,
   onDeleteChannel,
 }: ChannelCardProps) {
   const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
 
   async function handleSubmit(url: string) {
-    const res = await axios.post(
-      "http://localhost:8000/api/fetch-youtube-videos-from-channel-url/",
-      {
-        channel_url: url,
-      }
-    );
+    const data = await fetchVideosForChannel(url);
 
-    console.log(res.data);
-    router.push(`/channel/${res.data.task_id}`);
+    router.push(`/channel/${data.task_id}`);
+  }
+
+  async function handleDelete(channelId: number) {
+    try {
+      setDeleting(true);
+
+      await deleteChannelForUser(channelId);
+
+      onDeleteChannel(channelId);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -31,8 +44,8 @@ export default function ChannelCard({
         <button onClick={() => handleSubmit(channel.channel_url)}>
           Search this video
         </button>
-        <button onClick={() => onDeleteChannel(channel.id)}>
-          Delete channel
+        <button onClick={() => handleDelete(channel.id)} disabled={deleting}>
+          {deleting ? "Deleting..." : "Delete channel"}
         </button>
       </div>
     </li>

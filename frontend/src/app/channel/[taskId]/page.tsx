@@ -12,7 +12,7 @@ export default async function page({ params }: PageProps) {
   console.log(taskId);
 
   return (
-    <div>
+    <div className="max-w-[1150px] mx-auto px-[32px]">
       <ChannelDetails taskId={taskId} />
     </div>
   );

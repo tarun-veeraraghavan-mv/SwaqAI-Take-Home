@@ -1,7 +1,8 @@
 "use client";
 
+import { addChannelForUser } from "@/services/channels";
 import { AddChannelFormProps } from "@/types/channels";
-import axios from "axios";
+import { AxiosError } from "axios";
 import { useState } from "react";
 
 export default function AddChannelForm({ onAddChannels }: AddChannelFormProps) {
@@ -18,17 +19,12 @@ export default function AddChannelForm({ onAddChannels }: AddChannelFormProps) {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://localhost:8000/api/get-channel-details/",
-        {
-          handle: channelName,
-        }
-      );
-
-      console.log(res.data);
-      onAddChannels(res.data.channel);
+      const data = await addChannelForUser(channelName);
+      onAddChannels(data.channel);
     } catch (err) {
-      console.log(err);
+      if (err instanceof AxiosError) {
+        alert(err.response?.data.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -50,7 +46,7 @@ export default function AddChannelForm({ onAddChannels }: AddChannelFormProps) {
           </div>
           <div>
             <button disabled={loading}>
-              {loading ? "Adding channel" : "Add channel"}
+              {loading ? "Adding channel..." : "Add channel"}
             </button>
           </div>
         </form>

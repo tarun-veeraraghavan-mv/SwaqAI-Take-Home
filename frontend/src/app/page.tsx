@@ -9,7 +9,7 @@ export default async function Home() {
   console.log(res.data.channels);
 
   return (
-    <div>
+    <div className="max-w-[1150px] mx-auto px-[32px]">
       <UserChannelsListView />
     </div>
   );
