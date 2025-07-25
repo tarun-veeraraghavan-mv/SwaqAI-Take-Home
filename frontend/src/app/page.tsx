@@ -1,3 +1,9 @@
+import AddYoutubeChannelInput from "@/components/home/AddYoutubeChannelInput";
+
 export default function Home() {
-  return <div></div>;
+  return (
+    <div>
+      <AddYoutubeChannelInput />
+    </div>
+  );
 }

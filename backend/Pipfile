@@ -8,6 +8,15 @@ django = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
 djangorestframework-simplejwt = "*"
+pytube = "*"
+requests = "*"
+youtube-transcript-api = "*"
+yt-dlp = "*"
+langchain-openai = "*"
+langchain = "*"
+langchain-community = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 
