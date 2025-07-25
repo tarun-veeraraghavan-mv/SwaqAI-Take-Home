@@ -1,14 +1,12 @@
 "use client";
 
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ChannelDetails({ taskId }: { taskId: string }) {
+export default function VideoTranscriptDisplay({ taskId }: { taskId: string }) {
   const [loading, setLoading] = useState(false);
-  const [videos, setVideos] = useState<any[]>([]);
+  const [transcript, setTranscript] = useState("");
   const [status, setStatus] = useState<string>("PENDING");
-  const router = useRouter();
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -23,7 +21,8 @@ export default function ChannelDetails({ taskId }: { taskId: string }) {
         setStatus(taskStatus);
 
         if (taskStatus === "SUCCESS") {
-          setVideos(res.data.result.videos);
+          setTranscript(res.data.full_text);
+          console.log(res.data);
           clearInterval(interval); // stop polling
           setLoading(false);
         } else if (taskStatus === "FAILURE") {
@@ -47,21 +46,8 @@ export default function ChannelDetails({ taskId }: { taskId: string }) {
 
   return (
     <div>
-      <h2>✅ Videos fetched:</h2>
-      {videos?.length === 0 ? (
-        <p>No videos found.</p>
-      ) : (
-        <ul>
-          {videos?.map((video, idx) => (
-            <li key={idx}>
-              <p>{video.title}</p>
-              <button onClick={() => router.push(`/video/${video.video_id}`)}>
-                See video details
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <p>📜 Transcript:</p>
+      <p>{transcript}</p>
     </div>
   );
 }

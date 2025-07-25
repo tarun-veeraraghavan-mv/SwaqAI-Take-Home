@@ -18,6 +18,9 @@ langchain-community = "*"
 celery = "*"
 redis = "*"
 python-dotenv = "*"
+csvkit = "*"
+psycopg2 = "*"
+psycopg = "*"
 
 [dev-packages]
 

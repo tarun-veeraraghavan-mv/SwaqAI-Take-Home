@@ -7,8 +7,8 @@ interface PageProps {
   };
 }
 
-export default function page({ params }: PageProps) {
-  const { taskId } = params;
+export default async function page({ params }: PageProps) {
+  const { taskId } = await params;
   console.log(taskId);
 
   return (
