@@ -11,7 +11,7 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
       <p className="font-bold mb-3">{episode.title}</p>
       <div className="flex justify-between">
         <button
-          onClick={() => router.push(`/video/${episode.video_id}`)}
+          onClick={() => router.push(`/analysis/${episode.video_id}`)}
           className="bg-blue-400 text-white font-bold p-1 rounded-full"
         >
           Analyze video

@@ -19,3 +19,13 @@ export interface EpisodePaginationButtonProps {
   currentPage: number;
   totalPages: number;
 }
+
+export interface EpisodeDetail {
+  title: string;
+  description: string;
+  views: number;
+  likes: number;
+  duration: string;
+  published: string;
+  thumbnail: string;
+}

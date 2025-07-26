@@ -27,10 +27,11 @@ def get_video_details(request, video_id):
       video = {
           "title": data["snippet"]["title"],
           "description": data["snippet"]["description"],
-          "views": data["statistics"].get("viewCount"),
-          "likes": data["statistics"].get("likeCount"),
+          "views": int(data["statistics"].get("viewCount")),
+          "likes": int(data["statistics"].get("likeCount")) ,
           "duration": data["contentDetails"].get("duration"),
           "published": data["snippet"]["publishedAt"],
+          "thumbnail": data["snippet"]["thumbnails"]["high"]["url"],
       }
       
       cache.set(cache_key, video, timeout=1200)
@@ -61,6 +62,12 @@ def get_llm_response_of_episode(request, episode_id):
 
 @api_view(["GET"])
 def get_simple_transcript_fetcher(request, video_id):
+    cache_key = f"video-transcript:{video_id}"
+    cache_data = cache.get(key=cache_key)
+
+    if cache_data:
+        return Response(cache_data)
+
     response = requests.get(
         f"https://api.scrapingdog.com/youtube/transcripts/?api_key=68485af4f6497c6ac1c4ca16&v={video_id}"
     )
@@ -70,8 +77,6 @@ def get_simple_transcript_fetcher(request, video_id):
     except Exception as e:
         print("❌ Failed to parse JSON:", str(e))
         return "Failed to parse JSON"
-
-    print("🔍 TRANSCRIPT RAW:", data)
 
     if not isinstance(data, dict):
         return "API response is not a dict"
@@ -83,7 +88,11 @@ def get_simple_transcript_fetcher(request, video_id):
 
     full_text = " ".join(chunk.get("text", "") for chunk in transcript)
 
-    return Response({"full_text": full_text}) 
+    result = {"full_text": full_text}
+
+    cache.set(cache_key, result, timeout=3600)
+
+    return Response(result) 
 
 @api_view(["GET"])
 def get_simple_llm_fetcher(request, video_id):
