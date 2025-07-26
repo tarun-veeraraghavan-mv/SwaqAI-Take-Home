@@ -11,9 +11,7 @@ export default function ChannelDetails({ taskId }: { taskId: string }) {
   const router = useRouter();
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    const fetchTaskStatus = async () => {
+    const interval = setInterval(async () => {
       try {
         const res = await axios.get(
           `http://localhost:8000/api/get-task-status/${taskId}/`
@@ -35,10 +33,7 @@ export default function ChannelDetails({ taskId }: { taskId: string }) {
         clearInterval(interval); // kill polling on error
         setLoading(false);
       }
-    };
-
-    interval = setInterval(fetchTaskStatus, 2500);
-    fetchTaskStatus(); // hit immediately
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [taskId]);

@@ -1,9 +1,5 @@
 import VideoTranscriptDisplay from "@/components/video/VideoTranscriptDisplay";
-import {
-  getLLMResponseByVideoId,
-  getTranscriptByVideoId,
-  getVideoDetails,
-} from "@/services/videos";
+import { getTranscriptByVideoId, getVideoDetails } from "@/services/videos";
 
 interface PageProps {
   params: {
