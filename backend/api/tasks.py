@@ -20,7 +20,7 @@ def fetch_channel_videos_task(channel_url):
     cache_data = cache.get(key=cache_key)
 
     if cache_data:
-        return cache_data
+        return {**cache_data, "cache": True}
 
     try:
         # STEP 1: Get channel ID

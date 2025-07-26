@@ -29,3 +29,8 @@ export interface EpisodeDetail {
   published: string;
   thumbnail: string;
 }
+
+export interface EpisodeDetailTextBlockProps {
+  title?: string;
+  content?: string;
+}
