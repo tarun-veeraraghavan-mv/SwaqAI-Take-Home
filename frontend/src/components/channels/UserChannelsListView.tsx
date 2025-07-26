@@ -1,6 +1,6 @@
 "use client";
 
-import { useChannels } from "@/hooks/useChannels";
+import { useChannels } from "@/hooks/channels/useChannels";
 import AddChannelForm from "./AddChannelForm";
 import ChannelList from "./ChannelList";
 import { useState } from "react";

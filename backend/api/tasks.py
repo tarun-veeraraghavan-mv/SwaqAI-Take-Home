@@ -82,49 +82,36 @@ def fetch_channel_videos_task(channel_url):
         }
 
             
-@shared_task
-def fetch_transcript_task(video_id):
+@shared_task()
+def get_video_transcript_poll(video_id):
+    cache_key = f"video-transcript:{video_id}"
+    cache_data = cache.get(key=cache_key)
+
+    if cache_data:
+        return cache_data
+
     response = requests.get(
         f"https://api.scrapingdog.com/youtube/transcripts/?api_key=68485af4f6497c6ac1c4ca16&v={video_id}"
     )
 
     try:
         data = response.json()
+
+        if not isinstance(data, dict):
+            return "API response is not a dict"
+
+        if "transcripts" not in data:
+            return f"❌ 'transcripts' key not found. Got keys: {list(data.keys())}"
+
+        transcript = data["transcripts"]
+
+        full_text = " ".join(chunk.get("text", "") for chunk in transcript)
+
+        result = {"full_text": full_text}
+
+        cache.set(cache_key, result, timeout=3600)
+
+        return result
     except Exception as e:
         print("❌ Failed to parse JSON:", str(e))
         return "Failed to parse JSON"
-
-    print("🔍 TRANSCRIPT RAW:", data)
-
-    if not isinstance(data, dict):
-        return "API response is not a dict"
-
-    if "transcripts" not in data:
-        return f"❌ 'transcripts' key not found. Got keys: {list(data.keys())}"
-
-    transcript = data["transcripts"]
-
-    full_text = " ".join(chunk.get("text", "") for chunk in transcript)
-
-    episode = Episode.objects.create(transcript=full_text)
-
-    response_generation_task = generate_response_task.delay(transcript=full_text, episode_id=episode.id)
-
-    return {
-            "status": "SUCCESS",
-            "episode_id": episode.id,
-            "response_generation_task_id": response_generation_task.task_id
-        }
-
-@shared_task
-def generate_response_task(transcript: str, episode_id: int):
-    try:
-        response = generate_response(transcript=transcript)
-
-        episode = Episode.objects.get(id=episode_id)
-        episode.questions = response
-        episode.save()
-
-        return {"status": "SUCCESS", "episode_id": episode.id}
-    except Exception as e:
-        return {"status": "FAILURE", "error": str(e)}

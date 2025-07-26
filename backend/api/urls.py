@@ -1,7 +1,7 @@
 from django.urls import path
 from .views.youtube_loader import fetch_youtube_videos_from_channel_url, get_task_status
 from .views.channels import get_channels_for_user, delete_channel_for_user, create_channel_for_user
-from .views.episodes import get_video_details, get_episode_by_id, get_video_transcript
+from .views.episodes import get_video_details, get_episode_by_id, get_video_transcript, get_video_transcript_polling
 from .views.ai import create_analysis
 
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path("channels/videos/list/", fetch_youtube_videos_from_channel_url, name="get_videos_for_channel"),
     path("video/<video_id>/details/", get_video_details),
     path("video/<video_id>/transcript/", get_video_transcript),
+    path("video/<video_id>/transcript/poll/", get_video_transcript_polling),
     path("get-episode/<episode_id>/", get_episode_by_id),
     # ai related API routes - prod
     path("analysis/video/<video_id>/create/", create_analysis),

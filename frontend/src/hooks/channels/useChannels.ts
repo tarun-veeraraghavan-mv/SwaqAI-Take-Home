@@ -1,6 +1,5 @@
 import { fetchUserChannels } from "@/services/channels";
 import { Channel } from "@/types/channels";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
 export function useChannels() {

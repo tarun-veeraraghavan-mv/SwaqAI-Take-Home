@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from celery.result import AsyncResult
 from celery import chain
-from ..tasks import fetch_channel_videos_task, fetch_transcript_task, generate_response_task
+from ..tasks import fetch_channel_videos_task
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -21,18 +21,6 @@ def fetch_youtube_videos_from_channel_url(request):
         return Response({"task_id": task.id})
     except Exception as err:
         return Response({"error": err})
-    
-@api_view(["GET"])
-def fetch_video_transcript(request, video_id):
-    if not video_id:
-        return Response({"error": "Missing video_id"}, status=400)
-
-    task_chain = chain(
-        fetch_transcript_task.s(video_id),
-        generate_response_task.s()  
-    ).apply_async()
-
-    return Response({"task_id": task_chain.id}, status=202)
 
 @api_view(["GET"])
 def get_task_status(request, task_id):

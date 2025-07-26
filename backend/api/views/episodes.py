@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core.cache import cache
 from ..models import Episode
-from ..tasks import fetch_transcript_task
+from ..tasks import get_video_transcript_poll
 from ..llm_workflows.test import run_langgraph_pipeline
 
 YOUTUBE_API_KEY = "AIzaSyBiKuzKL7z9Be9ukgiGo0L_A5IGJf9RWr4"
@@ -83,3 +83,14 @@ def get_video_transcript(request, video_id):
     except Exception as e:
         print("❌ Failed to parse JSON:", str(e))
         return "Failed to parse JSON"
+    
+@api_view(["GET"])
+def get_video_transcript_polling(request, video_id):
+    print(video_id)
+
+    try:
+        task = get_video_transcript_poll.delay(video_id)
+
+        return Response({"task_id": task.id}) 
+    except Exception:
+        return {"error": "Error fetching transcript"}
