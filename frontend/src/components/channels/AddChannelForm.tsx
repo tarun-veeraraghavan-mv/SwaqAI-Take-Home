@@ -31,26 +31,27 @@ export default function AddChannelForm({ onAddChannels }: AddChannelFormProps) {
   }
 
   return (
-    <div>
-      <div>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="channelName">Channel name</label>
-            <input
-              type="text"
-              name="channelName"
-              id="channelName"
-              value={channelName}
-              onChange={(e) => setChannelName(e.target.value)}
-            />
-          </div>
-          <div>
-            <button disabled={loading}>
-              {loading ? "Adding channel..." : "Add channel"}
-            </button>
-          </div>
-        </form>
-      </div>
+    <div className="mb-5">
+      <form onSubmit={handleSubmit}>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            name="channelName"
+            id="channelName"
+            value={channelName}
+            onChange={(e) => setChannelName(e.target.value)}
+            placeholder="Add a new channel by giving their name"
+            className="py-2 px-3 outline-none w-[400px] text-md rounded-md border-2 border-gray-200"
+          />
+
+          <button
+            disabled={loading}
+            className="py-2 px-3 bg-indigo-400 font-bold text-white rounded-lg"
+          >
+            {loading ? "Adding channel..." : "Add channel"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

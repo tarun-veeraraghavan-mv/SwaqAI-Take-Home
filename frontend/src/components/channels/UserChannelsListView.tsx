@@ -1,46 +1,32 @@
 "use client";
 
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import ChannelList from "./ChannelList";
-import { Channel } from "@/types/channels";
+import { useChannels } from "@/hooks/useChannels";
 import AddChannelForm from "./AddChannelForm";
+import ChannelList from "./ChannelList";
+import { useState } from "react";
 
 export default function UserChannelsListView() {
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [searchChannelInput, setSearchChannelInput] = useState("");
+  const { handleAddChannels, handleDeleteChannel, loading, channels } =
+    useChannels();
 
-  useEffect(() => {
-    async function fetchChannelsForUser() {
-      try {
-        setLoading(true);
-
-        const res = await axios.get(
-          "http://localhost:8000/api/get-channels-for-user/"
-        );
-
-        console.log(res.data);
-        setChannels(res.data.channels);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchChannelsForUser();
-  }, []);
-
-  function handleAddChannels(channel: Channel) {
-    setChannels((prev) => [...prev, channel]);
-  }
-
-  function handleDeleteChannel(channelId: number) {
-    setChannels((prev) => prev.filter((c) => c.id !== channelId));
-  }
+  const filteredChannels = searchChannelInput
+    ? channels.filter((c) =>
+        c.title.toLowerCase().includes(searchChannelInput.toLowerCase())
+      )
+    : channels;
 
   return (
     <div>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search your channels..."
+          value={searchChannelInput}
+          onChange={(e) => setSearchChannelInput(e.target.value)}
+          className="py-2 px-3 bg-gray-200 outline-none w-[100%] text-md rounded-md"
+        />
+      </div>
       <div>
         <AddChannelForm onAddChannels={handleAddChannels} />
       </div>
@@ -48,10 +34,13 @@ export default function UserChannelsListView() {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <ChannelList
-            channels={channels}
-            onDeleteChannel={handleDeleteChannel}
-          />
+          <div>
+            <p className="font-bold text-xl mb-4">Your channels</p>
+            <ChannelList
+              channels={filteredChannels}
+              onDeleteChannel={handleDeleteChannel}
+            />
+          </div>
         )}
       </div>
     </div>
