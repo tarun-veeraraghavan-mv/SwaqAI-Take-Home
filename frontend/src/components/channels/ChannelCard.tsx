@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ChannelCardProps } from "@/types/channels";
-import {
-  deleteChannelForUser,
-  fetchVideosForChannel,
-} from "@/services/channels";
+import { deleteChannelForUser } from "@/services/channels";
+import { fetchVideosForChannel } from "@/services/videos";
 
 export default function ChannelCard({
   channel,

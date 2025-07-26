@@ -15,14 +15,15 @@ def fetch_youtube_videos_from_channel_url(request):
     if not channel_url:
         return Response({"error": "Missing channel_url"}, status=400)
 
-    # Fire off the task
-    task = fetch_channel_videos_task.delay(channel_url)
+    try:
+        task = fetch_channel_videos_task.delay(channel_url)
 
-    return Response({"task_id": task.id})
+        return Response({"task_id": task.id})
+    except Exception as err:
+        return Response({"error": err})
     
-@api_view(["POST"])
-def fetch_video_transcript(request):
-    video_id = request.data.get("video_id")
+@api_view(["GET"])
+def fetch_video_transcript(request, video_id):
     if not video_id:
         return Response({"error": "Missing video_id"}, status=400)
 
@@ -40,7 +41,7 @@ def extract_questions(request):
     if not transcript:
         return Response({"error": "Missing transcript"}, status=400)
 
-    try:
+    try: 
         output = generate_response(transcript=transcript)
         print(output)
         return Response('ok')

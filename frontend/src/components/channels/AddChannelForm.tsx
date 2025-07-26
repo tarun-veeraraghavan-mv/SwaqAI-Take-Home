@@ -21,9 +21,12 @@ export default function AddChannelForm({ onAddChannels }: AddChannelFormProps) {
 
       const data = await addChannelForUser(channelName);
       onAddChannels(data.channel);
+      setChannelName("");
     } catch (err) {
       if (err instanceof AxiosError) {
         alert(err.response?.data.error);
+      } else {
+        alert("Something went wrong");
       }
     } finally {
       setLoading(false);

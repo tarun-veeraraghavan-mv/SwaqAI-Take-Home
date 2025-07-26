@@ -15,15 +15,19 @@ def get_channels_for_user(request):
 
     if cached_data:
         return Response({"channels": cached_data, "cached": True})
+    
+    try:
+        channels = Channel.objects.all()
 
-    channels = Channel.objects.all()
+        serialized = ChannelSerializer(channels, many=True)
 
-    serialized = ChannelSerializer(channels, many=True)
+        cache.set(cache_key, serialized.data, timeout=1200)
+        print("Set in cache", serialized.data)
 
-    cache.set(cache_key, serialized.data, timeout=1200)
-    print("Set in cache", serialized.data)
+        return Response({"channels": serialized.data, "cached": False})
 
-    return Response({"channels": serialized.data, "cached": False})
+    except Exception as err:
+        return Response({"error": "Error fetching channels"}, status=404)
 
 @api_view(["POST"])
 def create_channel_for_user(request):

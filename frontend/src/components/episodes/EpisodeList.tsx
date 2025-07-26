@@ -1,6 +1,6 @@
 "use client";
 
-import { useEpisodes } from "@/hooks/episodes/useEpisodes";
+import { useEpisodes } from "@/hooks/useEpisodes";
 import { useState } from "react";
 import EpisodeCard from "./EpisodeCard";
 import EpisodePaginationButton from "./EpisodePaginationButton";

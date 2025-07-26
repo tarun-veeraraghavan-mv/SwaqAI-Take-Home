@@ -49,22 +49,6 @@ Respond in JSON format like:
 ("human", "{transcript}")
 ])
 
-# def generate_response(transcript: str):
-#     chunks = chunk_transcript(transcript)
-#     all_responses = []
-
-#     for chunk in chunks:
-#         try:
-#             response = llm_chain.invoke({"transcript": chunk})
-#             parsed = json.loads(response.content) if hasattr(response, "content") else json.loads(response)
-#             all_responses.extend(parsed)
-#         except Exception as e:
-#             print("❌ Error processing chunk:", str(e))
-#             continue
-
-#     return all_responses
-
-
 llm_chain = prompt | llm
 
 from langgraph.graph import END, StateGraph

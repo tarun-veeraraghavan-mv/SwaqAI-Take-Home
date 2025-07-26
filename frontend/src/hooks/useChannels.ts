@@ -1,3 +1,4 @@
+import { fetchUserChannels } from "@/services/channels";
 import { Channel } from "@/types/channels";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -11,12 +12,8 @@ export function useChannels() {
       try {
         setLoading(true);
 
-        const res = await axios.get(
-          "http://localhost:8000/api/get-channels-for-user/"
-        );
-
-        console.log(res.data);
-        setChannels(res.data.channels);
+        const data = await fetchUserChannels();
+        setChannels(data.channels);
       } catch (err) {
         console.log(err);
       } finally {
