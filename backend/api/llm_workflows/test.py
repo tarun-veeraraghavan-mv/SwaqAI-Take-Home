@@ -6,7 +6,7 @@ from langgraph.graph import START, END, StateGraph
 import json
 
 llm = ChatOpenAI(
-    openai_api_key="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",
+    openai_api_key="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",
     model="deepseek/deepseek-r1-0528-qwen3-8b:free",
     openai_api_base="https://openrouter.ai/api/v1",
 )
