@@ -23,8 +23,9 @@ def create_analysis(request, video_id):
         full_text = " ".join(chunk.get("text", "") for chunk in transcript)
 
         response = llm_chain.invoke({"transcript", full_text})
+        print("LLM RESPONSE: ", response.content)
 
-        return Response(response.content) 
+        return Response({"output": response.content}) 
     except Exception as e:
         print("❌ Failed to parse JSON:", str(e))
         return "Failed to parse JSON"

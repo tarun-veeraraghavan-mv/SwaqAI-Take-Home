@@ -22,6 +22,8 @@ csvkit = "*"
 psycopg2 = "*"
 psycopg = "*"
 django-redis = "*"
+exceptiongroup = "*"
+langgraph = "*"
 
 [dev-packages]
 

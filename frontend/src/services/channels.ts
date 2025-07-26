@@ -1,5 +1,11 @@
 import axios from "axios";
 
+export async function hello() {
+  const res = await axios.get("http://localhost:8000/api/hello/");
+
+  return res.data;
+}
+
 export async function addChannelForUser(channelName: string) {
   const res = await axios.post("http://localhost:8000/api/channels/", {
     handle: channelName,

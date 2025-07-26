@@ -33,21 +33,6 @@ def fetch_video_transcript(request, video_id):
     ).apply_async()
 
     return Response({"task_id": task_chain.id}, status=202)
-    
-@api_view(["POST"])
-def extract_questions(request):
-    transcript = request.data.get("transcript")
-
-    if not transcript:
-        return Response({"error": "Missing transcript"}, status=400)
-
-    try: 
-        output = generate_response(transcript=transcript)
-        print(output)
-        return Response('ok')
-
-    except Exception as e:
-        return Response({"error": str(e)}, status=500)
 
 @api_view(["GET"])
 def get_task_status(request, task_id):

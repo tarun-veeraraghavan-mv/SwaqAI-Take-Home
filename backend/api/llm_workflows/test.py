@@ -5,16 +5,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langgraph.graph import START, END, StateGraph
 import json
 
-# def chunk_transcript(transcript: str):
-#     splitter = RecursiveCharacterTextSplitter(
-#         chunk_size=4000,
-#         chunk_overlap=300
-#     )
-#     return splitter.split_text(transcript)
-
-
 llm = ChatOpenAI(
-    openai_api_key="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",
+    openai_api_key="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",
     model="deepseek/deepseek-r1-0528-qwen3-8b:free",
     openai_api_base="https://openrouter.ai/api/v1",
 )

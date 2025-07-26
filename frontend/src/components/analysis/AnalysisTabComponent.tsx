@@ -4,6 +4,7 @@ import { useState } from "react";
 import EpisodeDetails from "./EpisodeDetails";
 import EpisodeTranscript from "./EpisodeTranscript";
 import TabComponentButtons from "./TabComponentButtons";
+import { createAnalysisForVideo } from "@/services/analysis";
 
 export default function AnalysisTabComponent({
   episodeId,
@@ -25,7 +26,9 @@ export default function AnalysisTabComponent({
       )}
       {currentTab === "keyQuestions" && (
         <div>
-          <p>Key questions</p>
+          <button onClick={() => createAnalysisForVideo(episodeId)}>
+            Create analaysis
+          </button>
         </div>
       )}
     </div>
